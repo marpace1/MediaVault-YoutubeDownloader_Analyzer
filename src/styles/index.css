@@ -1,0 +1,147 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ----------------------------- design tokens ----------------------------- */
+@layer base {
+  :root {
+    /* Dark theme (default). Values are space-separated RGB for <alpha-value>. */
+    --surface: 16 16 24;
+    --surface-muted: 24 24 36;
+    --surface-elevated: 32 32 48;
+    --text: 237 237 245;
+    --text-muted: 148 150 170;
+    --border: 255 255 255;
+    --bg-from: 11 11 18;
+    --bg-to: 18 16 30;
+  }
+
+  :root.light {
+    --surface: 255 255 255;
+    --surface-muted: 244 245 250;
+    --surface-elevated: 255 255 255;
+    --text: 24 24 33;
+    --text-muted: 100 104 124;
+    --border: 17 17 25;
+    --bg-from: 238 240 250;
+    --bg-to: 226 228 244;
+  }
+
+  * {
+    @apply border-white/5;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+    margin: 0;
+  }
+
+  body {
+    @apply font-sans antialiased;
+    color: rgb(var(--text));
+    background: radial-gradient(
+        1200px 800px at 80% -10%,
+        rgba(99, 102, 241, 0.18),
+        transparent 60%
+      ),
+      radial-gradient(900px 700px at -10% 110%, rgba(168, 85, 247, 0.14), transparent 55%),
+      linear-gradient(160deg, rgb(var(--bg-from)), rgb(var(--bg-to)));
+    background-attachment: fixed;
+    overflow: hidden;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-white/10;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-white/20;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+/* ----------------------------- components -------------------------------- */
+@layer components {
+  /* Frosted glass panel — the signature surface of the app. */
+  .glass {
+    background: rgb(var(--surface-muted) / 0.55);
+    @apply backdrop-blur-xl border border-white/10 shadow-glass;
+  }
+
+  .glass-elevated {
+    background: rgb(var(--surface-elevated) / 0.7);
+    @apply backdrop-blur-2xl border border-white/10 shadow-glass;
+  }
+
+  .text-muted {
+    color: rgb(var(--text-muted));
+  }
+
+  /* Primary gradient button */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r
+      from-brand-500 to-brand-600 px-4 py-2.5 text-sm font-semibold text-white
+      shadow-glow transition-all hover:from-brand-400 hover:to-brand-500
+      active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-white/10
+      bg-white/5 px-4 py-2.5 text-sm font-medium text-[rgb(var(--text))]
+      transition-all hover:bg-white/10 active:scale-[0.98]
+      disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-icon {
+    @apply inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/10
+      bg-white/5 text-[rgb(var(--text-muted))] transition-all hover:bg-white/10
+      hover:text-[rgb(var(--text))] active:scale-95;
+  }
+
+  .input-field {
+    @apply w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm
+      text-[rgb(var(--text))] outline-none transition-all placeholder:text-[rgb(var(--text-muted))]
+      focus:border-brand-400/60 focus:ring-2 focus:ring-brand-500/30;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5
+      px-3 py-1 text-xs font-medium text-[rgb(var(--text-muted))];
+  }
+
+  /* Skeleton shimmer */
+  .skeleton {
+    @apply relative overflow-hidden rounded-lg bg-white/5;
+  }
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0 -translate-x-full animate-shimmer;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.08),
+      transparent
+    );
+  }
+}
+
+@layer utilities {
+  /* Native-app drag region for the custom titlebar */
+  .drag {
+    -webkit-app-region: drag;
+  }
+  .no-drag {
+    -webkit-app-region: no-drag;
+  }
+  .gpu {
+    transform: translateZ(0);
+    will-change: transform, opacity;
+  }
+}
