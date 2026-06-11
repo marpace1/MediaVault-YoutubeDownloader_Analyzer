@@ -1,4 +1,4 @@
-# MediaVault
+# MediaVault - made to free yall youtuber from the hassle to go to different sites which hardly works, all in one place by marpace <3 
 
 > A premium, cross-platform desktop application for downloading YouTube videos,
 > audio, thumbnails, subtitles and entire playlists — powered by **yt-dlp** and
@@ -29,7 +29,7 @@ error recovery.
 
 ---
 
-## 🚀 Quick start (development)
+##  Quick start (development)
 
 ```bash
 # 1. Install dependencies
@@ -75,7 +75,7 @@ details (code signing, FFmpeg bundling, auto-updater publishing).
 
 ---
 
-## 🗂 Project structure
+##  Project structure
 
 ```
 mediavault/
@@ -96,11 +96,48 @@ mediavault/
 ├── build/                    # electron-builder resources (icons, entitlements)
 ├── resources/bin/<os>/       # bundled yt-dlp / ffmpeg (gitignored)
 └── scripts/                  # fetch-binaries helper
+
+structure generated with help of ai-
 ```
+---
+---
+
+## Acknowledgements
+
+MediaVault would not be possible without the work of the open-source community and the maintainers of:
+
+* Electron
+* React
+* TypeScript
+* TailwindCSS
+* Framer Motion
+* yt-dlp
+* FFmpeg
+* better-sqlite3
 
 ---
 
-## 🔐 Security model
+## Support
+
+If you run into issues, have suggestions, or would like to contribute:
+
+**Discord Server**
+https://discord.gg/PJp2uA9xt7
+
+**Discord**
+marpaceamv
+
+**Email**
+[marpaceamv@gmail.com](mailto:marpaceamv@gmail.com)
+
+**YouTube**
+https://www.youtube.com/@marpace1
+
+---
+
+---
+
+##  Security model
 
 - **contextIsolation: true**, **nodeIntegration: false** — the renderer never
   touches Node directly.
@@ -117,3 +154,5 @@ mediavault/
 
 MIT — see source headers. yt-dlp and FFmpeg are separate projects under their own
 licenses; bundle them in accordance with those licenses.
+
+
