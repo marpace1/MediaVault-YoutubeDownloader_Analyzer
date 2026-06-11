@@ -1,23 +1,63 @@
-### AL ###
-#Template for AL projects for Dynamics 365 Business Central
-#launch.json folder
+# Dependencies
+
+node_modules/
+
+# Build output
+
+dist/
+dist-electron/
+release/
+out/
+
+# Logs
+
+*.log
+logs/
+
+# OS files
+
+.DS_Store
+Thumbs.db
+.sudo_as_admin_successful
+
+# Environment variables
+
+.env
+.env.*
+!.env.example
+
+# User data / local app data
+
+.config/
+.pki/
+
+# Databases
+
+*.db
+*.sqlite
+*.sqlite3
+
+# Electron user data
+
+Cookies
+Preferences
+Local Storage/
+Session Storage/
+Code Cache/
+GPUCache/
+
+# IDE files
+
 .vscode/
-#Cache folder
-.alcache/
-#Symbols folder
-.alpackages/
-#Snapshots folder
-.snapshots/
-#Testing Output folder
-.output/
-#Extension App-file
-*.app
-#Rapid Application Development File
-rad.json
-#Translation Base-file
-*.g.xlf
-#License-files
-*.bclicense
-*.flf
-#Test results file
-TestResults.xml
+.idea/
+
+# Bundled binaries
+
+resources/bin/*/yt-dlp*
+resources/bin/*/ffmpeg*
+!resources/bin/*/.gitkeep
+
+# Temporary files
+
+*.tmp
+*.cache
