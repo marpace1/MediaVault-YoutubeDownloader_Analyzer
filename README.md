@@ -18,23 +18,26 @@ Under the hood, it's an Electron + React + TypeScript app styled with TailwindCS
 <img src="ss.webp" alt="MediaVault App Preview" width="80%"/>
 </p>
 
-✨ Features
-Area
-Highlights
-Video	144p → 2160p (4K) + Best Available, MP4 / MKV output, automatic FFmpeg muxing
-Audio	MP3, M4A, AAC, WAV, FLAC, OGG · 128 / 192 / 256 / 320 kbps · Best
-Thumbnails	Every available resolution with dimensions + lightbox preview & one-click download
-Subtitles	SRT / VTT / TXT, human + auto-generated, multi-language
-Analytics	Views, likes, comments, subs, tags, category, language, live/age status, formats, tracks
-Playlists	Full or hand-picked downloads, bulk video/audio with one quality selection
-Download Manager	Queue, concurrency limit, pause/resume/cancel/retry, speed + ETA, search/filter/sort
-Smart UX	Clipboard URL detection, drag & drop, paste button, URL validation, duplicate detection
-Interface	Dark/Light/System themes, glassmorphism, Framer Motion transitions, skeletons, toasts, context menus
-Platform	Windows (NSIS), macOS (DMG/ZIP), Linux (AppImage/deb), auto-updater
+## ✨ Features
 
-🚀 Quick Start (Development)
-bash
+| Area | Highlights |
+|------|-----------|
+| **Video** | 144p → 2160p (4K) + *Best Available*, MP4 / MKV output, automatic FFmpeg muxing |
+| **Audio** | MP3, M4A, AAC, WAV, FLAC, OGG · 128 / 192 / 256 / 320 kbps · *Best* |
+| **Thumbnails** | Every available resolution with dimensions + lightbox preview & one-click download |
+| **Subtitles** | SRT / VTT / TXT, human + auto-generated, multi-language |
+| **Analytics** | Views, likes, comments, subs, tags, category, language, live/age status, formats, tracks |
+| **Playlists** | Full or hand-picked downloads, bulk video/audio with one quality selection |
+| **Download Manager** | Queue, concurrency limit, pause/resume/cancel/retry, speed + ETA, search/filter/sort |
+| **Smart** | Clipboard URL detection, drag & drop, paste button, URL validation, duplicate detection |
+| **UX** | Dark/Light/System themes, glassmorphism, Framer Motion transitions, skeletons, toasts, context menus |
+| **Platform** | Windows (NSIS), macOS (DMG/ZIP), Linux (AppImage/deb), auto-updater |
 
+---
+
+##  Quick start (development)
+
+```bash
 # 1. Install dependencies
 npm install
 
@@ -48,16 +51,20 @@ npm run rebuild
 
 # 4. Start the app in dev mode (Vite + Electron with HMR)
 npm run dev
-Engines: MediaVault looks for yt-dlp and ffmpeg in this order:
+```
 
-Custom path set in Settings
-Bundled binary in resources/bin/<platform>
-System PATH
-If neither is found, a warning banner appears on the Home screen linking to Settings.
+> **Engines:** MediaVault looks for `yt-dlp` and `ffmpeg` in this order:
+> 1. Custom path set in **Settings**
+> 2. Bundled binary in `resources/bin/<platform>`
+> 3. System `PATH`
+>
+> If neither is found, a warning banner appears on the Home screen linking to Settings.
 
-📦 Production Build
-bash
+---
 
+## 📦 Production build
+
+```bash
 # Fetch bundled binaries for the target platform (recommended)
 npm run fetch-binaries          # current OS
 # npm run fetch-binaries:all    # yt-dlp for all OSes
@@ -67,11 +74,16 @@ npm run build         # current platform
 npm run build:win     # Windows x64 NSIS installer
 npm run build:mac     # macOS DMG + ZIP
 npm run build:linux   # Linux AppImage + deb
-Output is written to release/<version>/. Check out BUILD.md for full details on code signing, FFmpeg bundling, and auto-updater publishing.
+```
 
-📂 Project Structure
-text
+Output is written to `release/<version>/`. See **[BUILD.md](./BUILD.md)** for full
+details (code signing, FFmpeg bundling, auto-updater publishing).
 
+---
+
+##  Project structure
+
+```
 mediavault/
 ├── electron/                 # Main process (Node side)
 │   ├── main/                 #   app entry + IPC registration
@@ -90,25 +102,64 @@ mediavault/
 ├── build/                    # electron-builder resources (icons, entitlements)
 ├── resources/bin/<os>/       # bundled yt-dlp / ffmpeg (gitignored)
 └── scripts/                  # fetch-binaries helper
-🙏 Acknowledgements
-MediaVault wouldn't exist without the hard work of the open-source community and the maintainers of:
 
-Electron, React, TypeScript, TailwindCSS, Framer Motion, yt-dlp, FFmpeg, and better-sqlite3.
+structure generated with help of ai-
+```
+---
+---
 
-💬 Support
-If you run into issues, have suggestions, or just want to hang out:
+## Acknowledgements
 
-Discord Server: https://discord.gg/PJp2uA9xt7
-Discord Username: marpaceamv
-Email: marpaceamv@gmail.com
-YouTube: https://www.youtube.com/@marpace1
+MediaVault would not be possible without the work of the open-source community and the maintainers of:
 
-🔒 Security Model
-contextIsolation: true, nodeIntegration: false — the renderer never touches Node directly.
-A typed preload bridge exposes only a minimal, audited API surface.
-Strict Content-Security-Policy in index.html.
-All URLs are validated + normalised in the main process before reaching any child process (no shell, execFile/spawn with explicit args — no injection).
-Filenames are sanitised cross-platform.
-External links open in the system browser, never in-app.
-📄 License
-MIT — see source headers. yt-dlp and FFmpeg are separate projects under their own licenses; bundle them in accordance with those licenses.
+* Electron
+* React
+* TypeScript
+* TailwindCSS
+* Framer Motion
+* yt-dlp
+* FFmpeg
+* better-sqlite3
+
+---
+
+## Support
+
+If you run into issues, have suggestions, or would like to contribute:
+
+**Discord Server**
+https://discord.gg/PJp2uA9xt7
+
+**Discord**
+marpaceamv
+
+**Email**
+[marpaceamv@gmail.com](mailto:marpaceamv@gmail.com)
+
+**YouTube**
+https://www.youtube.com/@marpace1
+
+---
+
+---
+
+##  Security model
+
+- **contextIsolation: true**, **nodeIntegration: false** — the renderer never
+  touches Node directly.
+- A typed **preload bridge** exposes only a minimal, audited API surface.
+- Strict **Content-Security-Policy** in `index.html`.
+- All URLs are validated + normalised in the main process before reaching any
+  child process (no shell, `execFile`/`spawn` with explicit args — no injection).
+- Filenames are sanitised cross-platform.
+- External links open in the system browser, never in-app.
+
+---
+
+## 📄 License
+
+MIT — see source headers. yt-dlp and FFmpeg are separate projects under their own
+licenses; bundle them in accordance with those licenses.
+
+
+
