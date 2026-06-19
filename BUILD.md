@@ -1,159 +1,114 @@
-# MediaVault — Build & Release Guide
+<p align="center">
+<img src="banner.png" alt="MediaVault Banner" width="100%"/>
+</p>
 
-Everything you need to produce distributable installers and wire up
-auto-updates.
+<h1 align="center">MediaVault</h1>
 
----
+<p align="center"><em>Download. Analyze. Manage.</em></p>
 
-## 1. Prerequisites
+<p align="center">
+Made to free y'all from the hassle of jumping between sketchy sites that hardly work. Everything you need for YouTube downloading, all in one place. Built with love by marpace <3
+</p>
 
-- Node.js 18+ (20 recommended)
-- npm 9+
-- Native build toolchain (for `better-sqlite3`):
-  - **Windows:** Visual Studio Build Tools → "Desktop development with C++"
-  - **macOS:** `xcode-select --install`
-  - **Linux:** `sudo apt install build-essential python3`
+MediaVault is a cross-platform desktop app built to make downloading YouTube videos, audio, thumbnails, subtitles, and entire playlists completely painless. It's powered by yt-dlp and FFmpeg, wrapped up in a sleek glassmorphism UI.
 
-Install dependencies and rebuild native modules for Electron:
+Under the hood, it's an Electron + React + TypeScript app styled with TailwindCSS and animated with Framer Motion. It uses better-sqlite3 for local download history and features a robust background download manager—packing a real queue, concurrency control, pause/resume/cancel/retry, live progress, and graceful error recovery.
 
-```bash
+<p align="center">
+<img src="ss.webp" alt="MediaVault App Preview" width="80%"/>
+</p>
+
+✨ Features
+Area
+Highlights
+Video	144p → 2160p (4K) + Best Available, MP4 / MKV output, automatic FFmpeg muxing
+Audio	MP3, M4A, AAC, WAV, FLAC, OGG · 128 / 192 / 256 / 320 kbps · Best
+Thumbnails	Every available resolution with dimensions + lightbox preview & one-click download
+Subtitles	SRT / VTT / TXT, human + auto-generated, multi-language
+Analytics	Views, likes, comments, subs, tags, category, language, live/age status, formats, tracks
+Playlists	Full or hand-picked downloads, bulk video/audio with one quality selection
+Download Manager	Queue, concurrency limit, pause/resume/cancel/retry, speed + ETA, search/filter/sort
+Smart UX	Clipboard URL detection, drag & drop, paste button, URL validation, duplicate detection
+Interface	Dark/Light/System themes, glassmorphism, Framer Motion transitions, skeletons, toasts, context menus
+Platform	Windows (NSIS), macOS (DMG/ZIP), Linux (AppImage/deb), auto-updater
+
+🚀 Quick Start (Development)
+bash
+
+# 1. Install dependencies
 npm install
-npm run rebuild   # electron-builder install-app-deps
-```
 
----
+# 2. (Optional) rebuild native modules for Electron's ABI
+npm run rebuild
 
-## 2. Bundling the engines (yt-dlp + FFmpeg)
+# 3. Make sure yt-dlp and ffmpeg are available
+#    - either on your system PATH, or
+#    - fetched into resources/bin via:  npm run fetch-binaries
+#    - or set custom paths later in Settings → Engine status
 
-`electron-builder` is configured to copy `resources/bin/<os>/` into the packaged
-app under `resources/bin` (see `build.extraResources` in `package.json`). At
-runtime, `electron/utils/binaries.ts` resolves binaries from there first.
+# 4. Start the app in dev mode (Vite + Electron with HMR)
+npm run dev
+Engines: MediaVault looks for yt-dlp and ffmpeg in this order:
 
-### yt-dlp (automated)
-```bash
-npm run fetch-binaries        # downloads yt-dlp for the current OS
-npm run fetch-binaries:all    # downloads yt-dlp for win/mac/linux
-```
+Custom path set in Settings
+Bundled binary in resources/bin/<platform>
+System PATH
+If neither is found, a warning banner appears on the Home screen linking to Settings.
 
-### FFmpeg **and FFprobe** (manual or via ffmpeg-static)
-FFmpeg builds are large and platform-specific. You must bundle **BOTH `ffmpeg`
-AND `ffprobe`** — yt-dlp's post-processing (merging MKV/MP4, embedding
-thumbnails/metadata) calls `ffprobe`, so an `ffmpeg`-only bundle causes
-"ffprobe not found" errors even though the media downloads.
+📦 Production Build
+bash
 
-**A. Drop in static binaries** into the matching folder:
-```
-resources/bin/win/ffmpeg.exe   resources/bin/win/ffprobe.exe
-resources/bin/mac/ffmpeg       resources/bin/mac/ffprobe
-resources/bin/linux/ffmpeg     resources/bin/linux/ffprobe
-```
-Get static builds from https://ffmpeg.org/download.html (or gyan.dev for
-Windows). Official static archives include both `ffmpeg` and `ffprobe`.
+# Fetch bundled binaries for the target platform (recommended)
+npm run fetch-binaries          # current OS
+# npm run fetch-binaries:all    # yt-dlp for all OSes
 
-**B. Use ffmpeg-static / ffprobe-static during CI:**
-```bash
-npm i -D ffmpeg-static ffprobe-static
-# copy node_modules/ffmpeg-static/ffmpeg(.exe)              -> resources/bin/<os>/
-# copy node_modules/ffprobe-static/bin/<os>/<arch>/ffprobe  -> resources/bin/<os>/
-```
-
-> The build runs `npm run check-binaries` first and **fails** if `yt-dlp` is
-> missing (warns if ffmpeg/ffprobe are missing). Use `--strict` to also fail on
-> missing ffmpeg/ffprobe.
->
-> If you don't bundle FFmpeg/FFprobe, the app still works when they're on the
-> user's PATH or set in Settings — it just isn't fully self-contained.
-
-Make the unix binaries executable before packaging:
-```bash
-chmod +x resources/bin/mac/* resources/bin/linux/*
-```
-
----
-
-## 3. Building installers
-
-```bash
+# Build installers
 npm run build         # current platform
-npm run build:win     # Windows x64 → NSIS installer (release/<v>/MediaVault-Setup-<v>.exe)
-npm run build:mac     # macOS → DMG + ZIP
-npm run build:linux   # Linux → AppImage + deb
-```
+npm run build:win     # Windows x64 NSIS installer
+npm run build:mac     # macOS DMG + ZIP
+npm run build:linux   # Linux AppImage + deb
+Output is written to release/<version>/. Check out BUILD.md for full details on code signing, FFmpeg bundling, and auto-updater publishing.
 
-`npm run build` runs, in order: `tsc --noEmit` → `vite build` (renderer + main +
-preload) → `electron-builder`. Output lands in `release/<version>/`.
+📂 Project Structure
+text
 
-### Build matrix notes
-- Build **Windows** installers on Windows (or via CI with wine).
-- Build **macOS** installers on macOS (signing/notarization requires it).
-- **Linux** can be built on Linux or in a Linux CI container.
+mediavault/
+├── electron/                 # Main process (Node side)
+│   ├── main/                 #   app entry + IPC registration
+│   ├── preload/              #   secure context-bridge API
+│   ├── services/             #   yt-dlp, download manager, settings, deps, updater
+│   ├── db/                   #   SQLite (better-sqlite3) persistence
+│   └── utils/                #   binaries resolver, validation, errors, logger
+├── shared/                   # Types shared by main + renderer (single source of truth)
+├── src/                      # Renderer (React)
+│   ├── components/           #   reusable UI + video/ panels
+│   ├── pages/                #   Home, Video, Downloads, Playlists, Audio, Thumbnails, Analytics, Settings
+│   ├── store/                #   Zustand stores (settings, downloads, ui)
+│   ├── hooks/                #   useAnalyze
+│   ├── lib/                  #   formatters, option lists, helpers
+│   └── styles/               #   Tailwind + design tokens
+├── build/                    # electron-builder resources (icons, entitlements)
+├── resources/bin/<os>/       # bundled yt-dlp / ffmpeg (gitignored)
+└── scripts/                  # fetch-binaries helper
+🙏 Acknowledgements
+MediaVault wouldn't exist without the hard work of the open-source community and the maintainers of:
 
----
+Electron, React, TypeScript, TailwindCSS, Framer Motion, yt-dlp, FFmpeg, and better-sqlite3.
 
-## 4. Icons
+💬 Support
+If you run into issues, have suggestions, or just want to hang out:
 
-Place these in `build/`:
-- `icon.ico` (Windows, 256×256 multi-res)
-- `icon.icns` (macOS)
-- `icon.png` (Linux, 512×512 or 1024×1024) — already provided
+Discord Server: https://discord.gg/PJp2uA9xt7
+Discord Username: marpaceamv
+Email: marpaceamv@gmail.com
+YouTube: https://www.youtube.com/@marpace1
 
-Generate `.ico`/`.icns` from `build/icon.png` with tools like
-`electron-icon-builder` or online converters.
-
----
-
-## 5. Code signing (recommended for distribution)
-
-### Windows
-Set environment variables before `npm run build:win`:
-```bash
-set CSC_LINK=path\to\cert.pfx
-set CSC_KEY_PASSWORD=yourpassword
-```
-
-### macOS (sign + notarize)
-```bash
-export CSC_LINK=path/to/cert.p12
-export CSC_KEY_PASSWORD=yourpassword
-export APPLE_ID=you@example.com
-export APPLE_APP_SPECIFIC_PASSWORD=abcd-efgh-ijkl-mnop
-export APPLE_TEAM_ID=XXXXXXXXXX
-```
-Hardened runtime + entitlements are already configured in
-`build/entitlements.mac.plist`.
-
----
-
-## 6. Auto-updater
-
-The app uses `electron-updater` (`electron/services/updater.ts`). It checks for
-updates 5 s after launch and every 6 hours, auto-downloads, and prompts the user
-to restart & install via the in-app banner.
-
-### Configure the publish target
-In `package.json → build.publish`, set your GitHub repo:
-```json
-"publish": [{ "provider": "github", "owner": "your-org", "repo": "mediavault" }]
-```
-
-### Publish a release
-```bash
-# Requires a GitHub token with repo scope
-export GH_TOKEN=ghp_xxx
-npm run build:win   # add "-p always" by editing the script, or:
-npx electron-builder --win --publish always
-```
-electron-builder uploads the installer **and** the `latest.yml` metadata the
-updater reads. Bump `version` in `package.json` for each release.
-
-> Auto-update is disabled in development (`app.isPackaged === false`).
-
----
-
-## 7. Verifying a build locally
-
-```bash
-npm run typecheck   # tsc --noEmit  → must be clean
-npm run lint        # eslint        → must be clean
-npm run build       # produces installers in release/<version>/
-```
+🔒 Security Model
+contextIsolation: true, nodeIntegration: false — the renderer never touches Node directly.
+A typed preload bridge exposes only a minimal, audited API surface.
+Strict Content-Security-Policy in index.html.
+All URLs are validated + normalised in the main process before reaching any child process (no shell, execFile/spawn with explicit args — no injection).
+Filenames are sanitised cross-platform.
+External links open in the system browser, never in-app.
+📄 License
+MIT — see source headers. yt-dlp and FFmpeg are separate projects under their own licenses; bundle them in accordance with those licenses.
