@@ -1,0 +1,63 @@
+# Dependencies
+
+node_modules/
+
+# Build output
+
+dist/
+dist-electron/
+release/
+out/
+
+# Logs
+
+*.log
+logs/
+
+# OS files
+
+.DS_Store
+Thumbs.db
+.sudo_as_admin_successful
+
+# Environment variables
+
+.env
+.env.*
+!.env.example
+
+# User data / local app data
+
+.config/
+.pki/
+
+# Databases
+
+*.db
+*.sqlite
+*.sqlite3
+
+# Electron user data
+
+Cookies
+Preferences
+Local Storage/
+Session Storage/
+Code Cache/
+GPUCache/
+
+# IDE files
+
+.vscode/
+.idea/
+
+# Bundled binaries
+
+resources/bin/*/yt-dlp*
+resources/bin/*/ffmpeg*
+!resources/bin/*/.gitkeep
+
+# Temporary files
+
+*.tmp
+*.cache
