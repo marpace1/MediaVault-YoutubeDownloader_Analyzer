@@ -1,114 +1,42 @@
-<p align="center">
-<img src="banner.png" alt="MediaVault Banner" width="100%"/>
-</p>
+MediaVault — Build & Release Guide
+Everything you need to produce distributable installers and wire up auto-updates.
 
-<h1 align="center">MediaVault</h1>
+1. Prerequisites
+Node.js 18+ (20 recommended)
+npm 9+
+Native build toolchain (for better-sqlite3):
+Windows: Visual Studio Build Tools → "Desktop development with C++"
+macOS: xcode-select --install
+Linux: sudo apt install build-essential python3
+Install dependencies and rebuild native modules for Electron:
 
-<p align="center"><em>Download. Analyze. Manage.</em></p>
-
-<p align="center">
-Made to free y'all from the hassle of jumping between sketchy sites that hardly work. Everything you need for YouTube downloading, all in one place. Built with love by marpace <3
-</p>
-
-MediaVault is a cross-platform desktop app built to make downloading YouTube videos, audio, thumbnails, subtitles, and entire playlists completely painless. It's powered by yt-dlp and FFmpeg, wrapped up in a sleek glassmorphism UI.
-
-Under the hood, it's an Electron + React + TypeScript app styled with TailwindCSS and animated with Framer Motion. It uses better-sqlite3 for local download history and features a robust background download manager—packing a real queue, concurrency control, pause/resume/cancel/retry, live progress, and graceful error recovery.
-
-<p align="center">
-<img src="ss.webp" alt="MediaVault App Preview" width="80%"/>
-</p>
-
-✨ Features
-Area
-Highlights
-Video	144p → 2160p (4K) + Best Available, MP4 / MKV output, automatic FFmpeg muxing
-Audio	MP3, M4A, AAC, WAV, FLAC, OGG · 128 / 192 / 256 / 320 kbps · Best
-Thumbnails	Every available resolution with dimensions + lightbox preview & one-click download
-Subtitles	SRT / VTT / TXT, human + auto-generated, multi-language
-Analytics	Views, likes, comments, subs, tags, category, language, live/age status, formats, tracks
-Playlists	Full or hand-picked downloads, bulk video/audio with one quality selection
-Download Manager	Queue, concurrency limit, pause/resume/cancel/retry, speed + ETA, search/filter/sort
-Smart UX	Clipboard URL detection, drag & drop, paste button, URL validation, duplicate detection
-Interface	Dark/Light/System themes, glassmorphism, Framer Motion transitions, skeletons, toasts, context menus
-Platform	Windows (NSIS), macOS (DMG/ZIP), Linux (AppImage/deb), auto-updater
-
-🚀 Quick Start (Development)
-bash
-
-# 1. Install dependencies
 npm install
+npm run rebuild   # electron-builder install-app-deps
+2. Bundling the engines (yt-dlp + FFmpeg)
+electron-builder is configured to copy resources/bin/<os>/ into the packaged app under resources/bin (see build.extraResources in package.json). At runtime, electron/utils/binaries.ts resolves binaries from there first.
 
-# 2. (Optional) rebuild native modules for Electron's ABI
-npm run rebuild
+yt-dlp (automated)
+npm run fetch-binaries        # downloads yt-dlp for the current OS
+npm run fetch-binaries:all    # downloads yt-dlp for win/mac/linux
+FFmpeg and FFprobe (manual or via ffmpeg-static)
+FFmpeg builds are large and platform-specific. You must bundle BOTH ffmpeg AND ffprobe — yt-dlp's post-processing (merging MKV/MP4, embedding thumbnails/metadata) calls ffprobe, so an ffmpeg-only bundle causes "ffprobe not found" errors even though the media downloads.
 
-# 3. Make sure yt-dlp and ffmpeg are available
-#    - either on your system PATH, or
-#    - fetched into resources/bin via:  npm run fetch-binaries
-#    - or set custom paths later in Settings → Engine status
+A. Drop in static binaries into the matching folder:
 
-# 4. Start the app in dev mode (Vite + Electron with HMR)
-npm run dev
-Engines: MediaVault looks for yt-dlp and ffmpeg in this order:
+resources/bin/win/ffmpeg.exe   resources/bin/win/ffprobe.exe
+resources/bin/mac/ffmpeg       resources/bin/mac/ffprobe
+resources/bin/linux/ffmpeg     resources/bin/linux/ffprobe
+Get static builds from https://ffmpeg.org/download.html (or gyan.dev for Windows). Official static archives include both ffmpeg and ffprobe.
 
-Custom path set in Settings
-Bundled binary in resources/bin/<platform>
-System PATH
-If neither is found, a warning banner appears on the Home screen linking to Settings.
+B. Use ffmpeg-static / ffprobe-static during CI:
 
-📦 Production Build
-bash
+npm i -D ffmpeg-static ffprobe-static
+# copy node_modules/ffmpeg-static/ffmpeg(.exe)              -> resources/bin/<os>/
+# copy node_modules/ffprobe-static/bin/<os>/<arch>/ffprobe  -> resources/bin/<os>/
+The build runs npm run check-binaries first and fails if yt-dlp is missing (warns if ffmpeg/ffprobe are missing). Use --strict to also fail on missing ffmpeg/ffprobe.
 
-# Fetch bundled binaries for the target platform (recommended)
-npm run fetch-binaries          # current OS
-# npm run fetch-binaries:all    # yt-dlp for all OSes
+If you don't bundle FFmpeg/FFprobe, the app still works when they're on the user's PATH or set in Settings — it just isn't fully self-contained.
 
-# Build installers
-npm run build         # current platform
-npm run build:win     # Windows x64 NSIS installer
-npm run build:mac     # macOS DMG + ZIP
-npm run build:linux   # Linux AppImage + deb
-Output is written to release/<version>/. Check out BUILD.md for full details on code signing, FFmpeg bundling, and auto-updater publishing.
+Make the unix binaries executable before packaging:
 
-📂 Project Structure
-text
-
-mediavault/
-├── electron/                 # Main process (Node side)
-│   ├── main/                 #   app entry + IPC registration
-│   ├── preload/              #   secure context-bridge API
-│   ├── services/             #   yt-dlp, download manager, settings, deps, updater
-│   ├── db/                   #   SQLite (better-sqlite3) persistence
-│   └── utils/                #   binaries resolver, validation, errors, logger
-├── shared/                   # Types shared by main + renderer (single source of truth)
-├── src/                      # Renderer (React)
-│   ├── components/           #   reusable UI + video/ panels
-│   ├── pages/                #   Home, Video, Downloads, Playlists, Audio, Thumbnails, Analytics, Settings
-│   ├── store/                #   Zustand stores (settings, downloads, ui)
-│   ├── hooks/                #   useAnalyze
-│   ├── lib/                  #   formatters, option lists, helpers
-│   └── styles/               #   Tailwind + design tokens
-├── build/                    # electron-builder resources (icons, entitlements)
-├── resources/bin/<os>/       # bundled yt-dlp / ffmpeg (gitignored)
-└── scripts/                  # fetch-binaries helper
-🙏 Acknowledgements
-MediaVault wouldn't exist without the hard work of the open-source community and the maintainers of:
-
-Electron, React, TypeScript, TailwindCSS, Framer Motion, yt-dlp, FFmpeg, and better-sqlite3.
-
-💬 Support
-If you run into issues, have suggestions, or just want to hang out:
-
-Discord Server: https://discord.gg/PJp2uA9xt7
-Discord Username: marpaceamv
-Email: marpaceamv@gmail.com
-YouTube: https://www.youtube.com/@marpace1
-
-🔒 Security Model
-contextIsolation: true, nodeIntegration: false — the renderer never touches Node directly.
-A typed preload bridge exposes only a minimal, audited API surface.
-Strict Content-Security-Policy in index.html.
-All URLs are validated + normalised in the main process before reaching any child process (no shell, execFile/spawn with explicit args — no injection).
-Filenames are sanitised cross-platform.
-External links open in the system browser, never in-app.
-📄 License
-MIT — see source headers. yt-dlp and FFmpeg are separate projects under their own licenses; bundle them in accordance with those licenses.
+chmod +x resources/bin/mac/* resources/bin/linux/*
