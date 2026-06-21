@@ -10,7 +10,7 @@
 Made to free y'all from the hassle of jumping between sketchy sites that hardly work. Everything you need for YouTube downloading, all in one place. Built with love by marpace <3
 </p>
 
-MediaVault is a cross-platform desktop app built to make downloading YouTube videos, audio, thumbnails, subtitles, and entire playlists completely painless. It's powered by yt-dlp and FFmpeg, wrapped up in a sleek glassmorphism UI.
+MediaVault is a cross-platform desktop app built to make downloading YouTube videos, audio, thumbnails, subtitles, and entire playlists completely painless. It's powered by yt-dlp and FFmpeg
 
 Under the hood, it's an Electron + React + TypeScript app styled with TailwindCSS and animated with Framer Motion. It uses better-sqlite3 for local download history and features a robust background download manager—packing a real queue, concurrency control, pause/resume/cancel/retry, live progress, and graceful error recovery.
 
